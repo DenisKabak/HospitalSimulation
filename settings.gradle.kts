@@ -1,0 +1,1 @@
+rootProject.name = "projekt_szpital_full"
