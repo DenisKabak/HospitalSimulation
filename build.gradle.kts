@@ -1,6 +1,8 @@
 plugins {
     application
     id("org.openjfx.javafxplugin") version "0.0.13"
+    java
+    jacoco
 }
 
 repositories {
@@ -19,4 +21,20 @@ javafx {
 
 application {
     mainClass.set("SymulacjaGraficzna")
+}
+jacoco {
+    toolVersion = "0.8.11"
+}
+
+tasks.test {
+    useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport) // po testach wygeneruj raport
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test) // raport wymaga testów
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
 }
