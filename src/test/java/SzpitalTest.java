@@ -1,5 +1,7 @@
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SzpitalTest {
 
@@ -13,7 +15,7 @@ public class SzpitalTest {
     @Test
     public void testSymulacjaZarazeniaIOzdrowienia() {
         Sala sala = new Sala(5);
-        Wirus wirus = new Wirus(5); // średnia agresywność
+        Wirus wirus = new Wirus(5); // Średnia agresywność
 
         Pacjent p1 = new ZdrowyPacjent(25, 'K', false, false, false);
         Pacjent p2 = new ZdrowyPacjent(40, 'M', true, true, false);
@@ -23,17 +25,22 @@ public class SzpitalTest {
         sala.dodajPacjenta(p2);
         sala.dodajPacjenta(p3);
 
-        // Symulacja 10 dni
         for (int dzien = 1; dzien <= 10; dzien++) {
-            for (Pacjent pacjent : sala.getPacjenci()) {
+            // Tworzymy snapshot, żeby nie modyfikować listy podczas iteracji
+            List<Pacjent> pacjenciSnapshot = new ArrayList<>(sala.getPacjenci());
+
+            for (Pacjent pacjent : pacjenciSnapshot) {
                 if (!pacjent.czyZyje()) continue;
 
                 if (pacjent.czyZarazony()) {
                     pacjent.inkrementujDzienZarazenia();
                     if (pacjent.getDniOdZarazenia() >= 3) {
                         double ryzyko = pacjent.obliczRyzykoZgonu(wirus.getAgresywnosc(), sala.oblozenieZywych());
-                        if (Math.random() < ryzyko) pacjent.umrzyj();
-                        else pacjent.ozdrowiej();
+                        if (Math.random() < ryzyko) {
+                            pacjent.umrzyj();
+                        } else {
+                            pacjent.ozdrowiej();
+                        }
                     }
                 } else if (pacjent.czyNiezarazony()) {
                     pacjent.zwiekszEkspozycje();
@@ -46,7 +53,7 @@ public class SzpitalTest {
             }
         }
 
-        int liczbaZywych = (int) sala.getPacjenci().stream().filter(Pacjent::czyZyje).count();
-        assertTrue(liczbaZywych > 0); // Sprawdzamy, że przynajmniej jeden pacjent przeżył
+        long zywi = sala.getPacjenci().stream().filter(Pacjent::czyZyje).count();
+        assertTrue(zywi > 0, "Przynajmniej jeden pacjent powinien przeżyć symulację.");
     }
 }
