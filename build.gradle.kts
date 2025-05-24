@@ -12,6 +12,7 @@ repositories {
 dependencies {
     implementation("org.openjfx:javafx-controls:20.0.2")
     implementation("org.openjfx:javafx-fxml:20.0.2")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
 }
 
 javafx {
@@ -36,5 +37,10 @@ tasks.jacocoTestReport {
     reports {
         xml.required.set(true)
         html.required.set(true)
+    }
+}
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Wirus.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">projekt_szpital_full</a> &gt; <a href="index.source.html" class="el_package">default</a> &gt; <span class="el_source">Wirus.java</span></div><h1>Wirus.java</h1><pre class="source lang-java linenums">// Reprezentuje wirusa, oblicza ryzyko zakażenia i zgonu
+import java.util.Random;
+
+public class Wirus {
+    private int agresywnosc;
+<span class="nc" id="L6">    private Random r = new Random();</span>
+
+<span class="nc" id="L8">    public Wirus(int agresywnosc) {</span>
+<span class="nc" id="L9">        this.agresywnosc = agresywnosc;</span>
+<span class="nc" id="L10">    }</span>
+
+    public int getAgresywnosc() {
+<span class="nc" id="L13">        return agresywnosc;</span>
+    }
+
+    private int okresInkubacji(Pacjent pacjent) {
+<span class="nc" id="L17">        int wiek = pacjent.getWiek();</span>
+        int podstawowy;
+<span class="nc bnc" id="L19" title="All 2 branches missed.">        if (wiek &lt; 35) podstawowy = 2;</span>
+<span class="nc bnc" id="L20" title="All 2 branches missed.">        else if (wiek &lt; 50) podstawowy = 3;</span>
+<span class="nc bnc" id="L21" title="All 2 branches missed.">        else if (wiek &lt; 65) podstawowy = 4;</span>
+<span class="nc bnc" id="L22" title="All 2 branches missed.">        else if (wiek &lt; 75) podstawowy = 5;</span>
+<span class="nc" id="L23">        else podstawowy = 6;</span>
+<span class="nc" id="L24">        return podstawowy + r.nextInt(2);</span>
+    }
+
+    private int obliczOdpornosc(Pacjent pacjent) {
+<span class="nc" id="L28">        int odpornosc = 0;</span>
+<span class="nc" id="L29">        int wiek = pacjent.getWiek();</span>
+<span class="nc bnc" id="L30" title="All 2 branches missed.">        if (wiek &lt; 20) odpornosc += 30;</span>
+<span class="nc bnc" id="L31" title="All 2 branches missed.">        else if (wiek &lt; 50) odpornosc += 15;</span>
+<span class="nc bnc" id="L32" title="All 2 branches missed.">        if (pacjent.czyZaszczepiony()) odpornosc += 30;</span>
+<span class="nc bnc" id="L33" title="All 2 branches missed.">        if (!pacjent.czyPrzewlekleChory()) odpornosc += 10;</span>
+<span class="nc bnc" id="L34" title="All 2 branches missed.">        if (!pacjent.maNalogi()) odpornosc += 10;</span>
+<span class="nc bnc" id="L35" title="All 2 branches missed.">        if (pacjent.getPlec() == 'K') odpornosc += 5;</span>
+<span class="nc" id="L36">        return odpornosc;</span>
+    }
+
+    public boolean[] zarazPacjenta(Pacjent pacjent, Sala sala, int dzien) {
+<span class="nc bnc" id="L40" title="All 2 branches missed.">        if (pacjent.isOdpornyNaZawsze()) return new boolean[]{false, false};</span>
+
+<span class="nc" id="L42">        double oblozenie = sala.oblozenieZywych();</span>
+
+<span class="nc bnc" id="L44" title="All 2 branches missed.">        if (pacjent.czyNiezarazony()) {</span>
+<span class="nc" id="L45">            int odp = obliczOdpornosc(pacjent);</span>
+<span class="nc bnc" id="L46" title="All 4 branches missed.">            if (odp &gt;= 60 &amp;&amp; pacjent.getDniEkspozycji() &gt; 5) return new boolean[]{false, false};</span>
+
+<span class="nc" id="L48">            double kontaktSzansa = oblozenie * 0.8;</span>
+<span class="nc bnc" id="L49" title="All 2 branches missed.">            if (r.nextDouble() &gt; kontaktSzansa) return new boolean[]{false, false};</span>
+
+<span class="nc" id="L51">            double dzienneRyzyko = agresywnosc * 5 + oblozenie * 50;</span>
+<span class="nc bnc" id="L52" title="All 2 branches missed.">            if (pacjent.czyPrzewlekleChory()) dzienneRyzyko += 15;</span>
+<span class="nc bnc" id="L53" title="All 2 branches missed.">            if (pacjent.czyZaszczepiony()) dzienneRyzyko *= 0.3;</span>
+
+<span class="nc" id="L55">            pacjent.zwiekszEkspozycje();</span>
+<span class="nc" id="L56">            double skumulowaneRyzyko = dzienneRyzyko * Math.sqrt(pacjent.getDniEkspozycji());</span>
+<span class="nc" id="L57">            skumulowaneRyzyko *= (1 - odp / 100.0);</span>
+<span class="nc" id="L58">            skumulowaneRyzyko = Math.min(skumulowaneRyzyko, 30);</span>
+
+<span class="nc" id="L60">            double los = r.nextDouble() * 100;</span>
+<span class="nc bnc" id="L61" title="All 6 branches missed.">            if (los &lt; skumulowaneRyzyko || (pacjent.getDniEkspozycji() == 0 &amp;&amp; r.nextDouble() &lt; 0.01)) {</span>
+<span class="nc" id="L62">                pacjent.zakazSie();</span>
+            }
+<span class="nc" id="L64">            return new boolean[]{false, false};</span>
+        }
+
+<span class="nc bnc" id="L67" title="All 2 branches missed.">        if (pacjent.czyZarazony()) {</span>
+<span class="nc" id="L68">            pacjent.inkrementujDzienZarazenia();</span>
+<span class="nc bnc" id="L69" title="All 2 branches missed.">            if (pacjent.getDniOdZarazenia() &lt; okresInkubacji(pacjent)) {</span>
+<span class="nc" id="L70">                return new boolean[]{false, false};</span>
+            }
+
+<span class="nc" id="L73">            int wiek = pacjent.getWiek();</span>
+            double ryzyko;
+
+<span class="nc bnc" id="L76" title="All 2 branches missed.">            if (wiek &lt; 35) ryzyko = 0.004;</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">            else if (wiek &lt; 45) ryzyko = 0.068;</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">            else if (wiek &lt; 55) ryzyko = 0.23;</span>
+<span class="nc bnc" id="L79" title="All 2 branches missed.">            else if (wiek &lt; 65) ryzyko = 0.75;</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">            else if (wiek &lt; 75) ryzyko = 2.5;</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">            else if (wiek &lt; 85) ryzyko = 8.5;</span>
+<span class="nc" id="L82">            else ryzyko = 28.3;</span>
+
+<span class="nc bnc" id="L84" title="All 2 branches missed.">            if (pacjent.czyPrzewlekleChory()) ryzyko += 5;</span>
+<span class="nc bnc" id="L85" title="All 2 branches missed.">            if (pacjent.maNalogi()) ryzyko += 5;</span>
+<span class="nc bnc" id="L86" title="All 2 branches missed.">            if (pacjent.getPlec() == 'M') ryzyko += 5;</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">            if (pacjent.czyZaszczepiony()) ryzyko *= 0.2;</span>
+
+<span class="nc" id="L89">            double los = r.nextDouble() * 100;</span>
+<span class="nc bnc" id="L90" title="All 2 branches missed.">            boolean zgon = los &lt; ryzyko;</span>
+<span class="nc bnc" id="L91" title="All 2 branches missed.">            boolean przeszedl = !zgon;</span>
+<span class="nc" id="L92">            return new boolean[]{zgon, przeszedl};</span>
+        }
+<span class="nc" id="L94">        return new boolean[]{false, false};</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
