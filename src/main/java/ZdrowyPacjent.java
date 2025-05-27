@@ -1,15 +1,15 @@
-// Pacjent zdrowy - logika zakażenia z mniejszym ryzykiem
 public class ZdrowyPacjent extends Pacjent {
-    public ZdrowyPacjent(int wiek, char plec, boolean nalogi, boolean przewlekleChory, boolean zaszczepieni) {
-        super(wiek, plec, nalogi, przewlekleChory, zaszczepieni);
+
+    public ZdrowyPacjent(int wiek, char plec, boolean nalogi,
+                         boolean przewlekleChory, boolean zaszczepiony) {
+        super(wiek, plec, nalogi, przewlekleChory, zaszczepiony);
     }
 
     @Override
-    public double obliczRyzykoZgonu(int agresywnosc, double oblozenie) {
-        double ryzyko = agresywnosc * 2;
+    public double obliczRyzykoZgonu(double agresywnosc, int wiek) {
+        double ryzyko = 0;
 
-        int wiek = getWiek();
-        if (wiek >= 70) ryzyko += 25;
+        if (getWiek() >= 70) ryzyko += 25;
         else if (wiek >= 50) ryzyko += 15;
         else if (wiek >= 20) ryzyko += 5;
 
@@ -18,7 +18,8 @@ public class ZdrowyPacjent extends Pacjent {
         if (getPlec() == 'M') ryzyko += 10;
         else if (getPlec() == 'K') ryzyko -= 10;
 
-        ryzyko *= (1 + oblozenie);
-        return ryzyko;
+        if (czyZaszczepiony())    ryzyko *= 0.2;
+
+        return agresywnosc*ryzyko;
     }
 }

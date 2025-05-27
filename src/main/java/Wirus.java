@@ -1,96 +1,102 @@
-// Reprezentuje wirusa, oblicza ryzyko zakażenia i zgonu
 import java.util.Random;
 
 public class Wirus {
-    private int agresywnosc;
-    private Random r = new Random();
+    private final double agresywnosc;
+    private final Random rnd = new Random();
 
-    public Wirus(int agresywnosc) {
+    public Wirus(double agresywnosc) {
         this.agresywnosc = agresywnosc;
     }
 
-    public int getAgresywnosc() {
-        return agresywnosc;
-    }
-
+    // Okres inkubacji w dniach, zależny od wieku + losowy dodatek 0–2
     private int okresInkubacji(Pacjent pacjent) {
         int wiek = pacjent.getWiek();
         int podstawowy;
-        if (wiek < 35) podstawowy = 2;
+        if (wiek < 35)      podstawowy = 2;
         else if (wiek < 50) podstawowy = 3;
         else if (wiek < 65) podstawowy = 4;
         else if (wiek < 75) podstawowy = 5;
-        else podstawowy = 6;
-        return podstawowy + r.nextInt(2);
+        else                podstawowy = 6;
+        return podstawowy + rnd.nextInt(3);
     }
 
-    private int obliczOdpornosc(Pacjent pacjent) {
-        int odpornosc = 0;
-        int wiek = pacjent.getWiek();
-        if (wiek < 20) odpornosc += 30;
-        else if (wiek < 50) odpornosc += 15;
-        if (pacjent.czyZaszczepiony()) odpornosc += 30;
-        if (!pacjent.czyPrzewlekleChory()) odpornosc += 10;
-        if (!pacjent.maNalogi()) odpornosc += 10;
-        if (pacjent.getPlec() == 'K') odpornosc += 5;
-        return odpornosc;
+    // Oblicza indywidualną odporność pacjenta (0–~65%)
+    private int obliczOdpornosc(Pacjent p) {
+        int odp = 0;
+        int wiek = p.getWiek();
+        if (wiek < 20)          odp += 30;
+        else if (wiek < 50)     odp += 15;
+        if (p.czyZaszczepiony())    odp += 30;
+        if (!p.czyPrzewlekleChory()) odp += 10;
+        if (!p.maNalogi())           odp += 10;
+        if (p.getPlec() == 'K')      odp += 5;
+        return odp;
     }
 
-    public boolean[] zarazPacjenta(Pacjent pacjent, Sala sala, int dzien) {
-        if (pacjent.isOdpornyNaZawsze()) return new boolean[]{false, false};
+    /*
+     Przebieg choroby:
+     [0] = zgon, [1] = wyzdrowienie */
+    public boolean[] zarazPacjenta(Pacjent p, Sala sala, int dzien) {
+        // 0) jeśli trwała odporność — bez zmian
+        if (p.isOdpornyNaZawsze()) {
+            return new boolean[]{false, false};
+        }
 
         double oblozenie = sala.oblozenieZywych();
 
-        if (pacjent.czyNiezarazony()) {
-            int odp = obliczOdpornosc(pacjent);
-            if (odp >= 60 && pacjent.getDniEkspozycji() > 5) return new boolean[]{false, false};
+        // 1) NIEZARAZONY → liczymy szansę zakażenia
+        if (p.czyNiezarazony()) {
 
+            // jeśli pacjent jest sam w sali (żywych ≤ 1), nie może się zarazić
+            int liczbaZywych = 0;
+            for (Pacjent pac : sala.getPacjenci()) {
+                if (pac.czyZyje()) liczbaZywych++;
+            }
+            if (liczbaZywych <= 1) {
+                return new boolean[]{false, false};
+            }
+
+            int odp = obliczOdpornosc(p);
+            // jeśli odporność wysoka i >5 dni ekspozycji -> nie zarazi się
+            if (odp >= 60 && p.getDniEkspozycji() > 5) {
+                return new boolean[]{false, false};
+            }
+            // czy w ogóle dochodzi do kontaktu?
             double kontaktSzansa = oblozenie * 0.8;
-            if (r.nextDouble() > kontaktSzansa) return new boolean[]{false, false};
-
+            if (rnd.nextDouble() > kontaktSzansa) {
+                p.zwiekszEkspozycje();
+                return new boolean[]{false, false};
+            }
+            // obliczamy dzienne ryzyko zakażenia(doszło do kontaktu)
             double dzienneRyzyko = agresywnosc * 5 + oblozenie * 50;
-            if (pacjent.czyPrzewlekleChory()) dzienneRyzyko += 15;
-            if (pacjent.czyZaszczepiony()) dzienneRyzyko *= 0.3;
+            if (p.czyPrzewlekleChory()) dzienneRyzyko += 15;
+            if (p.czyZaszczepiony())     dzienneRyzyko *= 0.3;
 
-            pacjent.zwiekszEkspozycje();
-            double skumulowaneRyzyko = dzienneRyzyko * Math.sqrt(pacjent.getDniEkspozycji());
-            skumulowaneRyzyko *= (1 - odp / 100.0);
-            skumulowaneRyzyko = Math.min(skumulowaneRyzyko, 30);
+            p.zwiekszEkspozycje();
+            double kumul = dzienneRyzyko * Math.sqrt(p.getDniEkspozycji());
+            kumul *= (1 - odp / 100.0);
+            kumul = Math.min(kumul, 30);
 
-            double los = r.nextDouble() * 100;
-            if (los < skumulowaneRyzyko || (pacjent.getDniEkspozycji() == 0 && r.nextDouble() < 0.01)) {
-                pacjent.zakazSie();
+            // finalne losowanie
+            if (rnd.nextDouble() * 100 < kumul || (p.getDniEkspozycji() == 0 && rnd.nextDouble() < 0.1)) {
+                p.zakazSie();
             }
             return new boolean[]{false, false};
         }
 
-        if (pacjent.czyZarazony()) {
-            pacjent.inkrementujDzienZarazenia();
-            if (pacjent.getDniOdZarazenia() < okresInkubacji(pacjent)) {
+        // 2) ZARAŻONY → po inkubacji decydujemy o zgonie / wyzdrowieniu
+        if (p.czyZarazony()) {
+            p.inkrementujDzienZarazenia();
+            if (p.getDniOdZarazenia() < okresInkubacji(p)) {
                 return new boolean[]{false, false};
             }
-
-            int wiek = pacjent.getWiek();
-            double ryzyko;
-
-            if (wiek < 35) ryzyko = 0.004;
-            else if (wiek < 45) ryzyko = 0.068;
-            else if (wiek < 55) ryzyko = 0.23;
-            else if (wiek < 65) ryzyko = 0.75;
-            else if (wiek < 75) ryzyko = 2.5;
-            else if (wiek < 85) ryzyko = 8.5;
-            else ryzyko = 28.3;
-
-            if (pacjent.czyPrzewlekleChory()) ryzyko += 5;
-            if (pacjent.maNalogi()) ryzyko += 5;
-            if (pacjent.getPlec() == 'M') ryzyko += 5;
-            if (pacjent.czyZaszczepiony()) ryzyko *= 0.2;
-
-            double los = r.nextDouble() * 100;
-            boolean zgon = los < ryzyko;
-            boolean przeszedl = !zgon;
-            return new boolean[]{zgon, przeszedl};
+            // ryzyko zgonu przekazywane do pacjenta (klasa zależna)
+            double ryz = p.obliczRyzykoZgonu(agresywnosc, p.getWiek());
+            boolean zgon = rnd.nextDouble() * 100 < ryz;
+            return new boolean[]{ zgon, !zgon };
         }
+
+        // 3) OZDROWIENIEC lub ZMARŁ → bez zmian
         return new boolean[]{false, false};
     }
 }

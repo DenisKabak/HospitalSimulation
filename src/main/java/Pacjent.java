@@ -1,4 +1,3 @@
-// Opis klasy pacjenta i jego stanów zdrowia
 public abstract class Pacjent {
     public enum StanInfekcji {
         NIEZARAZONY,
@@ -17,52 +16,101 @@ public abstract class Pacjent {
     private int dniOdZarazenia = 0;
     private int dniEkspozycji = 0;
 
-    public Pacjent(int wiek, char plec, boolean nalogi, boolean przewlekleChory, boolean zaszczepiony) {
+    public Pacjent(int wiek, char plec, boolean nalogi,
+                   boolean przewlekleChory, boolean zaszczepiony) {
         this.wiek = wiek;
         this.plec = plec;
         this.nalogi = nalogi;
         this.przewlekleChory = przewlekleChory;
         this.zaszczepiony = zaszczepiony;
 
-        double szansa = 0.01; // bazowa
-        if (wiek < 20) szansa += 0.10;
-        else if (wiek < 40) szansa += 0.05;
-        if (!przewlekleChory) szansa += 0.05;
-        if (!nalogi) szansa += 0.05;
-        if (plec == 'K') szansa += 0.02;
+        // losowa „genetyczna” odporność
+        double sz = 0.01;
+        if (wiek < 20) sz += 0.10;
+        else if (wiek < 40) sz += 0.05;
+        if (!przewlekleChory) sz += 0.05;
+        if (!nalogi) sz += 0.05;
+        if (plec == 'K') sz += 0.02;
 
-        this.odpornyNaZawsze = new java.util.Random().nextDouble() < szansa;
+        this.odpornyNaZawsze = Math.random() < sz;
     }
 
-    public int getWiek() { return wiek; }
-    public char getPlec() { return plec; }
-    public boolean maNalogi() { return nalogi; }
-    public boolean czyZyje() { return stanInfekcji != StanInfekcji.ZMARL; }
-    public boolean czyZaszczepiony() { return zaszczepiony; }
-    public boolean czyPrzewlekleChory() { return przewlekleChory; }
-    public boolean isOdpornyNaZawsze() { return odpornyNaZawsze; }
+    // ——— gettery —————
+    public int getWiek() {
+        return wiek;
+    }
 
-    public boolean czyZarazony() { return stanInfekcji == StanInfekcji.ZARAZONY; }
-    public boolean czyNiezarazony() { return stanInfekcji == StanInfekcji.NIEZARAZONY; }
+    public char getPlec() {
+        return plec;
+    }
 
+    public boolean maNalogi() {
+        return nalogi;
+    }
+
+    public boolean czyPrzewlekleChory() {
+        return przewlekleChory;
+    }
+
+    public boolean czyZaszczepiony() {
+        return zaszczepiony;
+    }
+
+    public StanInfekcji getStanInfekcji() {
+        return stanInfekcji;
+    }
+
+    public int getDniOdZarazenia() {
+        return dniOdZarazenia;
+    }
+
+    public int getDniEkspozycji() {
+        return dniEkspozycji;
+    }
+
+    public boolean isOdpornyNaZawsze() {
+        return odpornyNaZawsze;
+    }
+
+    public boolean czyZyje() {
+        return stanInfekcji != StanInfekcji.ZMARL;
+    }
+
+    public boolean czyZarazony() {
+        return stanInfekcji == StanInfekcji.ZARAZONY;
+    }
+
+    public boolean czyNiezarazony() {
+        return stanInfekcji == StanInfekcji.NIEZARAZONY;
+    }
+
+    // ——— zmiana stanu ———
     public void zakazSie() {
         stanInfekcji = StanInfekcji.ZARAZONY;
         dniOdZarazenia = 0;
         dniEkspozycji = 0;
     }
 
-    public void ozdrowiej() { stanInfekcji = StanInfekcji.OZDROWIENIEC; }
-    public void umrzyj() { stanInfekcji = StanInfekcji.ZMARL; }
-    public StanInfekcji getStanInfekcji() { return stanInfekcji; }
-
     public void inkrementujDzienZarazenia() {
         if (czyZarazony()) dniOdZarazenia++;
     }
 
-    public int getDniOdZarazenia() { return dniOdZarazenia; }
-    public void zwiekszEkspozycje() { dniEkspozycji++; }
-    public int getDniEkspozycji() { return dniEkspozycji; }
-    public void resetujEkspozycje() { dniEkspozycji = 0; }
+    public void zwiekszEkspozycje() {
+        if (czyNiezarazony()) dniEkspozycji++;
+    }
 
-    public abstract double obliczRyzykoZgonu(int agresywnosc, double oblozenie);
+    public void resetujEkspozycje() {
+        dniEkspozycji = 0;
+    }
+
+    public void ozdrowiej() {
+        stanInfekcji = StanInfekcji.OZDROWIENIEC;
+    }
+
+    public void umrzyj() {
+        stanInfekcji = StanInfekcji.ZMARL;
+    }
+
+    //Każdy podtyp pacjenta oblicza swoje ryzyko zgonu
+    public abstract double obliczRyzykoZgonu(double agresywnosc, int wiek);
 }

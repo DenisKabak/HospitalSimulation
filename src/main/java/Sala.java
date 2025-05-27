@@ -1,40 +1,38 @@
-// Reprezentuje salę szpitalną i przechowuje pacjentów
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.List;
 
 public class Sala {
-    private List<Pacjent> pacjenci = new ArrayList<>();
-    private int liczbaLozek;
+    private final int maxLozek;
+    private final List<Pacjent> pacjenci = new ArrayList<>();
 
-    public Sala(int liczbaLozek) {
-        this.liczbaLozek = liczbaLozek;
+    public Sala(int maxLozek) {
+        this.maxLozek = maxLozek;
     }
 
+    // Dodaje pacjenta, jeśli jest wolne miejsce
     public boolean dodajPacjenta(Pacjent p) {
-        if (pacjenci.size() < liczbaLozek) {
-            pacjenci.add(p);
-            return true;
-        }
-        return false;
+        if (pacjenci.size() >= maxLozek) return false;
+        pacjenci.add(p);
+        return true;
     }
 
+    // Zwraca niemodyfikowalną listę wszystkich pacjentów
     public List<Pacjent> getPacjenci() {
-        return pacjenci;
+        return Collections.unmodifiableList(pacjenci);
     }
 
+    // Zwraca obłożenie sali tylko przez żywych pacjentów
     public double oblozenieZywych() {
-        usunZmarlych();
-        long zywi = pacjenci.stream().filter(Pacjent::czyZyje).count();
-        if (zywi <= 1) return 0.0;
-        return (double) zywi / liczbaLozek;
+        int zywi = 0;
+        for (Pacjent p : pacjenci) {
+            if (p.czyZyje()) zywi++;
+        }
+        return (double) zywi / maxLozek;
     }
 
-    private void usunZmarlych() {
-        Iterator<Pacjent> iterator = pacjenci.iterator();
-        while (iterator.hasNext()) {
-            Pacjent p = iterator.next();
-            if (!p.czyZyje()) iterator.remove();
-        }
+    // Usuwa zmarłych pacjentów z listy
+    public void usunZmarlych() {
+        pacjenci.removeIf(p -> !p.czyZyje());
     }
 }

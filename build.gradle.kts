@@ -21,24 +21,27 @@ javafx {
 }
 
 application {
+    // Jeśli nie masz pakietu, zostaw tylko klasę:
     mainClass.set("SymulacjaGraficzna")
 }
+
 jacoco {
     toolVersion = "0.8.11"
 }
 
 tasks.test {
     useJUnitPlatform()
-    finalizedBy(tasks.jacocoTestReport) // po testach wygeneruj raport
+    finalizedBy(tasks.jacocoTestReport)
 }
 
 tasks.jacocoTestReport {
-    dependsOn(tasks.test) // raport wymaga testów
+    dependsOn(tasks.test)
     reports {
         xml.required.set(true)
         html.required.set(true)
     }
 }
+
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(21))
