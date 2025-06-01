@@ -13,6 +13,7 @@ dependencies {
     implementation("org.openjfx:javafx-controls:20.0.2")
     implementation("org.openjfx:javafx-fxml:20.0.2")
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    implementation("com.opencsv:opencsv:5.8")
 }
 
 javafx {
@@ -21,8 +22,7 @@ javafx {
 }
 
 application {
-    // Jeśli nie masz pakietu, zostaw tylko klasę:
-    mainClass.set("SymulacjaGraficzna")
+    mainClass.set("HospitalSimulation")
 }
 
 jacoco {
