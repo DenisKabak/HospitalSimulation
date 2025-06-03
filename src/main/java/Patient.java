@@ -44,7 +44,7 @@ public abstract class Patient {
         this.chronicallyIll = chronicallyIll;
         this.vaccinated = vaccinated;
 
-        // Losowa „genetyczna” odporność
+        // Losowa genetyczna odporność
         double chance = 0.01;
         if (age < 20) chance += 0.10;
         else if (age < 40) chance += 0.05;
@@ -131,12 +131,3 @@ public abstract class Patient {
      */
     public abstract double calculateDeathRisk(double aggressiveness, int age);
 }
-
-/*
- Mechanizmy programowania obiektowego zastosowane w tej klasie:
- - Klasa abstrakcyjna: Patient jest abstrakcyjny i wymusza implementację calculateDeathRisk w podklasach
- - Hermetyzacja: wszystkie pola są prywatne, dostęp do nich tylko przez gettery i metody
- - Dziedziczenie: klasy dziedziczące po Patient będą rozszerzać jego funkcjonalność
- - Polimorfizm: typ InfectionStatus jako enum umożliwia eleganczne przełączanie stanów oraz calculateDeathRisk()
- - Kompozycja: Patient agreguje enum InfectionStatus jako część swojego stanu
-*/

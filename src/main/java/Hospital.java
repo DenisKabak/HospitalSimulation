@@ -14,9 +14,8 @@ import java.util.ArrayList;
  * </ul>
  */
 public class Hospital {
-    // Hermetyzacja: prywatne pola klasy
-    private final List<Room> rooms; // Agregacja: Hospital ma listę pokoi, ale nie jest ich właścicielem w pełni (Room istnieje niezależnie)
-    private final Virus virus;      // Kompozycja: Hospital zawiera instancję wirusa, nie może działać bez niego
+    private final List<Room> rooms;
+    private final Virus virus;
 
     /**
      * Konstruktor klasy Hospital.
@@ -55,11 +54,3 @@ public class Hospital {
         }
     }
 }
-
-/*
-   Mechanizmy OOP zastosowane w tej klasie:
-   - Hermetyzacja (pola prywatne: rooms, virus)
-   - Kompozycja (Virus jest kluczowym elementem Hospital)
-   - Agregacja (Lista pokoi współistnieje, ale Hospital nie jest ich jedynym właścicielem)
-   - Polimorfizm (wywoływanie metod p.die() i p.recover() — mogą być przesłonięte w klasach potomnych Pacjenta)
-*/

@@ -56,10 +56,3 @@ public class SickPatient extends Patient {
         return aggressiveness * risk;
     }
 }
-
-/*
- Mechanizmy programowania obiektowego zastosowane w tej klasie:
- - Dziedziczenie: SickPatient rozszerza klasę abstrakcyjną Patient i dziedziczy jej pola i metody
- - Polimorfizm: implementuje abstrakcyjną metodę calculateDeathRisk zdefiniowaną w klasie Patient
- - Hermetyzacja: korzysta z getterów odziedziczonych z klasy Patient, które chronią prywatne pola
-*/

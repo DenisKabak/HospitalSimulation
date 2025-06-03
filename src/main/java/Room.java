@@ -14,10 +14,7 @@ import java.util.List;
  * </ul>
  */
 public class Room {
-    // Hermetyzacja: prywatne pole, liczba łóżek nie może być zmieniana z zewnątrz
     private final int maxBeds;
-
-    // Hermetyzacja + agregacja: lista pacjentów, mogą istnieć niezależnie od sali
     private final List<Patient> patients = new ArrayList<>();
 
     /**
@@ -40,7 +37,7 @@ public class Room {
     }
 
     /**
-     * Zwraca niemodyfikowalną (readonly) listę wszystkich pacjentów w sali.
+     * Zwraca niemodyfikowalną listę wszystkich pacjentów w sali.
      * Dzięki temu hermetyzujemy listę pacjentów przed przypadkową zmianą z zewnątrz.
      * @return niezmienialna lista pacjentów
      */
@@ -50,7 +47,6 @@ public class Room {
 
     /**
      * Zwraca obłożenie sali — tylko przez żywych pacjentów.
-     * Wspiera polimorfizm: p.isAlive() może być przesłonięta w podklasach.
      * @return liczba żywych pacjentów / liczba łóżek
      */
     public double livingOccupancy() {
@@ -69,10 +65,3 @@ public class Room {
         patients.removeIf(p -> !p.isAlive());
     }
 }
-
-/*
-   Mechanizmy OOP zastosowane w tej klasie:
-   - Hermetyzacja (pola prywatne: maxBeds, patients)
-   - Agregacja (Sala zawiera pacjentów, ale pacjent nie jest tworzony przez salę)
-   - Polimorfizm (metoda isAlive() może być przesłonięta w podklasach Pacjenta)
-*/

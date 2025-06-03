@@ -5,7 +5,7 @@
  * <ul>
  *   <li><b>Dziedziczenie:</b> rozszerza klasę abstrakcyjną {@link Patient}</li>
  *   <li><b>Polimorfizm:</b> implementuje metodę {@code calculateDeathRisk} wymuszoną przez klasę bazową</li>
- *   <li><b>Hermetyzacja:</b> korzysta wyłącznie z publicznych getterów zdefiniowanych w Patient</li>
+ *   <li><b>Hermetyzacja:</b> korzysta wyłącznie z getterów zdefiniowanych w Patient</li>
  * </ul>
  */
 public class HealthyPatient extends Patient {
@@ -53,10 +53,3 @@ public class HealthyPatient extends Patient {
         return aggressiveness * risk;
     }
 }
-
-/*
- Mechanizmy programowania obiektowego zastosowane w tej klasie:
- - Dziedziczenie: HealthyPatient rozszerza klasę abstrakcyjną Patient i dziedziczy jej pola i metody
- - Polimorfizm: implementuje abstrakcyjną metodę calculateDeathRisk zdefiniowaną w klasie Patient
- - Hermetyzacja: korzysta z getterów odziedziczonych z klasy Patient, które chronią prywatne pola
-*/

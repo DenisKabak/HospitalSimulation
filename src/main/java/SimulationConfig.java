@@ -1,7 +1,7 @@
 import com.opencsv.bean.CsvBindByName;
 
 /**
- * Klasa DTO służąca do wczytywania i przechowywania konfiguracji symulacji.
+ * Klasa służąca do wczytywania i przechowywania konfiguracji symulacji.
  *
  * <p>
  * Mechanizmy OOP zastosowane w tej klasie:

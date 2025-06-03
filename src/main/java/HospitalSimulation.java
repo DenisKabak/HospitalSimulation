@@ -24,7 +24,7 @@ import java.io.FileReader;
  * Mechanizmy programowania obiektowego:
  * <ul>
  *   <li><b>Dziedziczenie:</b> HospitalSimulation dziedziczy po Application (JavaFX), co umożliwia uruchomienie GUI.</li>
- *   <li><b>Hermetyzacja:</b> Pola prywatne, publiczne gettery/settery (przykład w klasie SimulationConfig).</li>
+ *   <li><b>Hermetyzacja:</b> Pola prywatne, publiczne gettery/settery</li>
  *   <li><b>Polimorfizm:</b> W liście allPatients przechowywane są różne podklasy Patient: HealthyPatient i SickPatient.</li>
  *   <li><b>Kompozycja:</b> Klasa posiada pola będące instancjami innych klas (np. Hospital, Virus, Room).</li>
  *   <li><b>Agregacja:</b> Hospital agreguje listę Room i obiekt Virus.</li>
@@ -105,9 +105,7 @@ public class HospitalSimulation extends Application {
         // POLIMORFIZM: Patient może być HealthyPatient lub SickPatient (dziedziczenie)
         for (int i = 0; i < patientCount; i++) {
             int age = ThreadLocalRandom.current().nextInt(minAge, maxAge + 1);
-            Patient p = chronic
-                    ? new SickPatient(age, gender, addictions, chronic, vaccinated)
-                    : new HealthyPatient(age, gender, addictions, chronic, vaccinated);
+            Patient p = chronic ? new SickPatient(age, gender, addictions, chronic, vaccinated) : new HealthyPatient(age, gender, addictions, chronic, vaccinated);
             allPatients.add(p);
             boolean added = false;
             while (!added) {

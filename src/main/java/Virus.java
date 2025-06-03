@@ -13,8 +13,8 @@ import java.util.Random;
  * </ul>
  */
 public class Virus {
-    private final double aggressiveness; // Hermetyzacja — pole prywatne, chronione przed bezpośrednim dostępem
-    private final Random rnd = new Random(); // Kompozycja — użycie klasy Random wewnątrz klasy Virus
+    private final double aggressiveness;
+    private final Random rnd = new Random();
 
     /**
      * Tworzy wirusa o zadanej agresywności.
@@ -130,12 +130,3 @@ public class Virus {
         return new boolean[]{false, false};
     }
 }
-
-/*
-   Mechanizmy OOP użyte w tej klasie:
-   - Hermetyzacja (pola prywatne: aggressiveness, rnd)
-   - Kompozycja (użycie klasy Random jako składnika klasy Virus)
-   - Agregacja (Virus współpracuje z Room i Patient, ale nie jest ich właścicielem)
-   - Polimorfizm (Patient to superklasa — może być HealthyPatient lub SickPatient)
-   - Brak interfejsów ani klas abstrakcyjnych w tej konkretnej klasie
-*/
